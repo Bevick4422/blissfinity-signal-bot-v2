@@ -1,59 +1,3 @@
-def bullish_structure(df):
-
-    try:
-
-        latest_close = (
-            df["close"].iloc[-1]
-        )
-
-        previous_high = (
-            df["high"]
-            .iloc[-20:-1]
-            .max()
-        )
-
-        return (
-            latest_close >
-            previous_high
-        )
-
-    except Exception as e:
-
-        print(
-            f"Bullish structure error: {e}"
-        )
-
-        return False
-
-
-def bearish_structure(df):
-
-    try:
-
-        latest_close = (
-            df["close"].iloc[-1]
-        )
-
-        previous_low = (
-            df["low"]
-            .iloc[-20:-1]
-            .min()
-        )
-
-        return (
-            latest_close <
-            previous_low
-        )
-
-    except Exception as e:
-
-        print(
-            f"Bearish structure error: {e}"
-        )
-
-        return False
-
-
 # ========================================
 # ENTRY CONFIRMATION
 # ========================================
@@ -62,12 +6,22 @@ def bullish_setup(df):
 
     try:
 
+        if df is None:
+            return False
+
+        if len(df) < 10:
+            return False
+
         latest_close = (
-            df["close"].iloc[-1]
+            float(
+                df["close"].iloc[-1]
+            )
         )
 
         latest_open = (
-            df["open"].iloc[-1]
+            float(
+                df["open"].iloc[-1]
+            )
         )
 
         previous_high = (
@@ -86,15 +40,20 @@ def bullish_setup(df):
             latest_open
         )
 
-        return (
-            breakout and
-            bullish_candle
-        )
+        if breakout and bullish_candle:
+
+            print(
+                "Bullish entry confirmed."
+            )
+
+            return True
+
+        return False
 
     except Exception as e:
 
         print(
-            f"Bullish setup error: {e}"
+            f"Bullish entry error: {e}"
         )
 
         return False
@@ -104,12 +63,22 @@ def bearish_setup(df):
 
     try:
 
+        if df is None:
+            return False
+
+        if len(df) < 10:
+            return False
+
         latest_close = (
-            df["close"].iloc[-1]
+            float(
+                df["close"].iloc[-1]
+            )
         )
 
         latest_open = (
-            df["open"].iloc[-1]
+            float(
+                df["open"].iloc[-1]
+            )
         )
 
         previous_low = (
@@ -128,15 +97,20 @@ def bearish_setup(df):
             latest_open
         )
 
-        return (
-            breakdown and
-            bearish_candle
-        )
+        if breakdown and bearish_candle:
+
+            print(
+                "Bearish entry confirmed."
+            )
+
+            return True
+
+        return False
 
     except Exception as e:
 
         print(
-            f"Bearish setup error: {e}"
+            f"Bearish entry error: {e}"
         )
 
         return False
