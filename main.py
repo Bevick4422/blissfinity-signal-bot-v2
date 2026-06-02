@@ -13,33 +13,23 @@ from signal_engine import (
     bearish_setup
 )
 
-from telegram_sender import send_signal
+from telegram_sender import (
+    send_signal
+)
 
+from trade_tracker import (
+    main as run_tracker
+)
+
+# ========================================
+# MARKET SCANNER
+# ========================================
 
 async def scan_market():
 
     print("\n========================")
     print("BLISSFINITY V2")
     print("========================\n")
-
-    # Telegram test
-    try:
-
-        await send_signal(
-            "TEST",
-            "SYSTEM ONLINE",
-            0,
-            0,
-            0,
-            0
-        )
-
-        print("Telegram test sent.\n")
-
-    except Exception as e:
-
-        print("Telegram test failed:")
-        print(e)
 
     signals_sent = 0
 
@@ -57,10 +47,15 @@ async def scan_market():
 
         if df is None:
 
-            print(f"{pair} -> no data")
+            print(
+                f"{pair} -> no data"
+            )
+
             continue
 
-        latest_close = df["close"].iloc[-1]
+        latest_close = (
+            df["close"].iloc[-1]
+        )
 
         previous_high = (
             df["high"]
@@ -81,7 +76,9 @@ async def scan_market():
             f"PrevLow={previous_low:.4f}"
         )
 
+        # ====================================
         # LONG
+        # ====================================
 
         if bullish_setup(df):
 
@@ -114,11 +111,15 @@ async def scan_market():
                 tp2
             )
 
-            print(f"{pair} LONG sent")
+            print(
+                f"{pair} LONG sent"
+            )
 
             signals_sent += 1
 
+        # ====================================
         # SHORT
+        # ====================================
 
         elif bearish_setup(df):
 
@@ -151,7 +152,9 @@ async def scan_market():
                 tp2
             )
 
-            print(f"{pair} SHORT sent")
+            print(
+                f"{pair} SHORT sent"
+            )
 
             signals_sent += 1
 
@@ -161,8 +164,9 @@ async def scan_market():
     print("SCAN COMPLETE")
     print("========================\n")
 
-
-import asyncio
+# ========================================
+# MASTER LOOP
+# ========================================
 
 async def main():
 
@@ -170,7 +174,19 @@ async def main():
 
         try:
 
+            # Scan market
             await scan_market()
+
+            # Track open trades
+            try:
+
+                await run_tracker()
+
+            except Exception as e:
+
+                print(
+                    f"Tracker error: {e}"
+                )
 
             print(
                 "\nSleeping for 5 minutes...\n"
@@ -186,53 +202,9 @@ async def main():
 
             await asyncio.sleep(60)
 
-import asyncio
-
-async def main():
-
-    while True:
-
-        try:
-
-            await scan_market()
-
-            print(
-                "\nSleeping for 5 minutes...\n"
-            )
-
-            await asyncio.sleep(300)
-
-        except Exception as e:
-
-            print(
-                f"Bot error: {e}"
-            )
-
-            await asyncio.sleep(60)
-
-import asyncio
-
-async def main():
-
-    while True:
-
-        try:
-
-            await scan_market()
-
-            print(
-                "\nSleeping for 5 minutes...\n"
-            )
-
-            await asyncio.sleep(300)
-
-        except Exception as e:
-
-            print(
-                f"Bot error: {e}"
-            )
-
-            await asyncio.sleep(60)
+# ========================================
+# START
+# ========================================
 
 if __name__ == "__main__":
 
