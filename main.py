@@ -3,12 +3,17 @@ import asyncio
 from config import (
     SYMBOLS,
     MAX_SIGNALS,
-    TIMEFRAME
+    TREND_TIMEFRAME,
+    ENTRY_TIMEFRAME
 )
 
-from scanner import get_klines
+from scanner import (
+    get_market_data
+)
 
 from signal_engine import (
+    bullish_structure,
+    bearish_structure,
     bullish_setup,
     bearish_setup
 )
@@ -28,7 +33,7 @@ from trade_tracker import (
 async def scan_market():
 
     print("\n========================")
-    print("BLISSFINITY V2")
+    print("BLISSFINITY V2.1")
     print("========================\n")
 
     signals_sent = 0
@@ -40,12 +45,13 @@ async def scan_market():
 
         print(f"Scanning {pair}...")
 
-        df = get_klines(
+        trend_df, entry_df = get_market_data(
             pair,
-            TIMEFRAME
+            TREND_TIMEFRAME,
+            ENTRY_TIMEFRAME
         )
 
-        if df is None:
+        if trend_df is None or entry_df is None:
 
             print(
                 f"{pair} -> no data"
@@ -53,52 +59,35 @@ async def scan_market():
 
             continue
 
-        latest_close = (
-            df["close"].iloc[-1]
-        )
-
-        previous_high = (
-            df["high"]
-            .iloc[-6:-1]
-            .max()
-        )
-
-        previous_low = (
-            df["low"]
-            .iloc[-6:-1]
-            .min()
-        )
-
-        print(
-            f"{pair} | "
-            f"Close={latest_close:.4f} | "
-            f"PrevHigh={previous_high:.4f} | "
-            f"PrevLow={previous_low:.4f}"
-        )
-
         # ====================================
         # LONG
         # ====================================
 
-        if bullish_setup(df):
+        if (
+            bullish_structure(trend_df)
+            and
+            bullish_setup(entry_df)
+        ):
 
             entry = round(
-                latest_close,
+                float(
+                    entry_df["close"].iloc[-1]
+                ),
                 4
             )
 
             stoploss = round(
-                entry * 0.985,
+                entry * 0.97,
                 4
             )
 
             tp1 = round(
-                entry * 1.02,
+                entry * 1.05,
                 4
             )
 
             tp2 = round(
-                entry * 1.04,
+                entry * 1.10,
                 4
             )
 
@@ -121,25 +110,31 @@ async def scan_market():
         # SHORT
         # ====================================
 
-        elif bearish_setup(df):
+        elif (
+            bearish_structure(trend_df)
+            and
+            bearish_setup(entry_df)
+        ):
 
             entry = round(
-                latest_close,
+                float(
+                    entry_df["close"].iloc[-1]
+                ),
                 4
             )
 
             stoploss = round(
-                entry * 1.015,
+                entry * 1.03,
                 4
             )
 
             tp1 = round(
-                entry * 0.98,
+                entry * 0.95,
                 4
             )
 
             tp2 = round(
-                entry * 0.96,
+                entry * 0.90,
                 4
             )
 
@@ -164,6 +159,7 @@ async def scan_market():
     print("SCAN COMPLETE")
     print("========================\n")
 
+
 # ========================================
 # MASTER LOOP
 # ========================================
@@ -174,10 +170,8 @@ async def main():
 
         try:
 
-            # Scan market
             await scan_market()
 
-            # Track open trades
             try:
 
                 await run_tracker()
@@ -201,6 +195,7 @@ async def main():
             )
 
             await asyncio.sleep(60)
+
 
 # ========================================
 # START

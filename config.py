@@ -1,12 +1,34 @@
 import os
 
-# Telegram
-TELEGRAM_TOKEN = "8893369285:AAHvZEWi9F6g5QpiXfpSLFo8YgV0TiTevIU"
-TELEGRAM_CHAT_ID = "6953501418"
-# Trading Settings
+# ========================================
+# TELEGRAM
+# ========================================
+
+TELEGRAM_TOKEN = os.getenv(
+    "TELEGRAM_TOKEN"
+)
+
+TELEGRAM_CHAT_ID = os.getenv(
+    "TELEGRAM_CHAT_ID"
+)
+
+# ========================================
+# TIMEFRAMES
+# ========================================
+
 TREND_TIMEFRAME = "4h"
+
 ENTRY_TIMEFRAME = "1h"
+
+# ========================================
+# SIGNAL SETTINGS
+# ========================================
+
 MAX_SIGNALS = 4
+
+# ========================================
+# WATCHLIST
+# ========================================
 
 SYMBOLS = [
 
@@ -15,14 +37,28 @@ SYMBOLS = [
     "SOL_USDT",
     "XRP_USDT",
     "DOGE_USDT",
+
     "AVAX_USDT",
     "LINK_USDT",
     "ADA_USDT",
     "SUI_USDT",
     "WLD_USDT",
+
     "NEAR_USDT",
     "INJ_USDT",
     "SEI_USDT",
-    "TIA_USDT"
+    "TIA_USDT",
+
+    "ARB_USDT",
+    "OP_USDT",
+    "APT_USDT",
+    "ATOM_USDT",
+    "TRX_USDT",
+
+    "ICP_USDT",
+    "HBAR_USDT",
+    "FET_USDT",
+    "RUNE_USDT",
+    "PENDLE_USDT"
 
 ]
