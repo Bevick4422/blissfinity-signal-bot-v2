@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 
 # ========================================
-# MEXC KLINES
+# GET KLINES FROM MEXC
 # ========================================
 
 def get_klines(
@@ -14,7 +14,7 @@ def get_klines(
     try:
 
         url = (
-            "https://contract.mexc.com"
+            f"https://contract.mexc.com"
             f"/api/v1/contract/kline/{symbol}"
             f"?interval={timeframe}"
         )
@@ -27,7 +27,7 @@ def get_klines(
         if response.status_code != 200:
 
             print(
-                f"{symbol} API error: "
+                f"{symbol} HTTP ERROR "
                 f"{response.status_code}"
             )
 
@@ -35,23 +35,51 @@ def get_klines(
 
         data = response.json()
 
+        # Debug if API returns error
+        if not isinstance(data, dict):
+
+            print(
+                f"{symbol} invalid response"
+            )
+
+            return None
+
         if "data" not in data:
 
             print(
-                f"{symbol} no data returned"
+                f"{symbol} API response:"
             )
+
+            print(data)
 
             return None
 
         candles = data["data"]
 
-        if len(candles["close"]) < 20:
+        if not candles:
 
             print(
-                f"{symbol} insufficient candles"
+                f"{symbol} empty candle data"
             )
 
             return None
+
+        required_keys = [
+            "open",
+            "high",
+            "low",
+            "close"
+        ]
+
+        for key in required_keys:
+
+            if key not in candles:
+
+                print(
+                    f"{symbol} missing key: {key}"
+                )
+
+                return None
 
         df = pd.DataFrame({
 
@@ -67,12 +95,20 @@ def get_klines(
 
         df = df.astype(float)
 
+        if len(df) < 20:
+
+            print(
+                f"{symbol} insufficient candles"
+            )
+
+            return None
+
         return df.tail(limit)
 
     except Exception as e:
 
         print(
-            f"{symbol} data error:"
+            f"{symbol} scanner error:"
         )
 
         print(e)
@@ -81,23 +117,23 @@ def get_klines(
 
 
 # ========================================
-# TREND + ENTRY DATA
+# MULTI TIMEFRAME DATA
 # ========================================
 
 def get_market_data(
     symbol,
-    trend_timeframe,
-    entry_timeframe
+    trend_tf,
+    entry_tf
 ):
 
     trend_df = get_klines(
         symbol,
-        trend_timeframe
+        trend_tf
     )
 
     entry_df = get_klines(
         symbol,
-        entry_timeframe
+        entry_tf
     )
 
     if trend_df is None:
