@@ -18,7 +18,7 @@ TELEGRAM_CHAT_ID = os.getenv(
 
 TREND_TIMEFRAME = "4h"
 
-ENTRY_TIMEFRAME = "1h"
+ENTRY_TIMEFRAME = "Min60"
 
 # ========================================
 # SIGNAL SETTINGS
