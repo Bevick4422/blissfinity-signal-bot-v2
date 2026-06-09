@@ -16,7 +16,7 @@ TELEGRAM_CHAT_ID = os.getenv(
 # TIMEFRAMES
 # ========================================
 
-TREND_TIMEFRAME = "4h"
+TREND_TIMEFRAME = "Hour4"
 
 ENTRY_TIMEFRAME = "Min60"
 
